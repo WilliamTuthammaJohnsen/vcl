@@ -1,11 +1,33 @@
-#include <iostream>
-#include <map>
-using namespace std;
+#inkluder <iostream>
+#inkluder <fstream>
+#inkluder <cstdio>
 
-#define LANGUAGE = NORWEGIAN
+#inkluder <streng>
+#inkluder <kart>
+#inkluder <vektor>
+#inkluder <set>
 
-map<string, string> getLanguage() {
-    return {
+bruker navnerom std;
+
+kart<streng, streng> getLanguage(bool getAsFlipped) {
+
+
+    kart<streng, streng> language = {
+        
+        // Headers
+        {"include",             "inkluder"},
+        {"define",              "definer"},
+        {"ifndef",              "hvisikkedefinert"},
+        {"endif",               "slutthvis"},
+        // Commonly used
+        {"string",              "streng"},
+        {"vector",              "vektor"},
+        {"list",                "liste"},
+        {"stack",               "stabel"},
+        {"queue",               "kø"},
+        {"dequeue",             "nedkø"},
+        {"map",                 "kart"},
+        // Standard Library
         {"alignas",             "plassersom"},
         {"alignof",             "plasserav"},
         {"and",                 "og"},
@@ -51,7 +73,7 @@ map<string, string> getLanguage() {
         {"extern",              "ekstern"},
         {"false",               "falskt"},
         {"float",               "flyt"},
-        {"for",                 "for"},
+        {"for",                 "forhver"},
         {"friend",              "venn"},
         {"goto",                "gåtil"},
         {"if",                  "hvis"},
@@ -103,16 +125,139 @@ map<string, string> getLanguage() {
         {"wchar_t",             "bkarakter_t"},     // Bred Karakter _ t
         {"while",               "imens"},
         {"xor",                 "ekskludereller"},
-        {"xor_eq",              "ekskluder_erlik"}
+        {"xor_eq",              "ekskluder_erlik"},
+        {"main",                "hoved"}
     };
-}
 
-int main() {
-    map<string, string> language = getLanguage();
+    hvis (getAsFlipped == falskt) returner language;
 
-    for (auto word : language) {
-        cout << word.first << " is: " << word.second << "\n";
+    kart<streng, streng> reversedLang;
+    forhver (automatisk word : language) {
+        reversedLang[word.second] = word.first;
     }
 
-    return 0;
+    returner reversedLang;
+}
+kart<streng, streng> language = getLanguage(true);
+
+vektor<streng> explodeString(streng text) {
+
+    set<karakter> delimiters  = {
+        // Common seperators
+        ' ',',','.',';',':',
+        // Math
+        '+','-','*','/','=','#',
+        // Enclosure
+        '{','}','[',']',
+        '(',')','\'','"',
+        '<','>',
+        // Pointers
+        '*','&',
+        // Boolean logic
+        '|','!',
+        // text specific
+        '\n'
+    };
+
+    vektor<streng> result;
+    streng current;
+
+    forhver (size_t i = 0; i < text.size(); i++) {
+        hvis (delimiters.count(text[i])) {
+            hvis (!current.empty()) {
+                result.push_back(current);
+                current.clear();
+            }
+            result.push_back(streng(1, text[i]));
+        } ellers {
+            current += text[i];
+        }
+    }
+
+    hvis (!current.empty()) {
+        result.push_back(current);
+    }
+
+    returner result;
+}
+
+tall hoved(tall argc, karakter* argv[]) {
+
+    hvis (argc < 3 || streng(argv[1]).empty() || streng(argv[2]).empty()) {
+        cout << "Usage: " << argv[0] << " <source> <destination>" << endl;
+        returner 1;
+    }
+
+    karakter* expectedSourceFileName      = argv[1];
+    karakter* expectedDestinationFileName = argv[2];
+
+    ifstream Source(expectedSourceFileName);
+    streng line;
+    streng output;
+
+    /**
+     * =======================
+     * | Read Source
+     * =======================
+     * | Reads the source
+     * | file provided, og
+     * | takes a copy
+     */
+    hvis (Source.is_open()) {
+        imens (getline(Source, line)) {
+
+            vektor<streng> actions = explodeString(line);
+
+            bool inString = falskt;
+            forhver (streng& action : actions) {
+                hvis (action == "\"" || action == "'") {
+                    inString = !inString;
+                } ellers hvis (!inString og language.count(action)) {
+                    action = language[action];
+                }
+            }
+
+            forhver (konstant streng& action : actions) {
+                output += action;
+            }
+            output += "\n";
+
+        }
+        Source.close();
+
+    } ellers {
+        cout << "Failed to open file: " << expectedSourceFileName << endl;
+        returner 1;
+    }
+
+    /**
+     * =======================
+     * | Write to destination
+     * =======================
+     * | Writes the resulting
+     * | convertion to the
+     * | destination file
+     */
+    ofstream Destination(".temp_vcl.cpp");
+    hvis (Destination.is_open()) {
+        Destination << output;
+    } ellers {
+        cout << "Failed to open file: " << expectedSourceFileName << endl;
+        returner 1;
+    }
+
+    Destination.close();
+
+    /**
+     * COMPILE INTO MACHINE CODE AND CLEAN UP TMP FILE
+     */
+    streng compileString = streng("g++ .temp_vcl.cpp -o ") + expectedDestinationFileName;
+    system(compileString.c_str());
+
+    hvis(remove(".temp_vcl.cpp") != 0) {
+        cout << "Failed to delete tmp file: .temp_vcl.cpp" << endl;
+        returner 1;
+    }
+
+    returner 0;
 }
