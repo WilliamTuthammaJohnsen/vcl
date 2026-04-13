@@ -1,0 +1,95 @@
+/**
+ * Human, a class defined outside of the main() function
+ * This is accessible throughout the rest of the file, and lives until killed by something else
+ *
+ */
+class Human {
+    public string name;
+    public int age;
+
+    public void Human(string name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public void ageUp(Human human = this) {
+        human.age ++;
+    }
+}
+
+class Student extends Human {
+    public string major;
+
+    public void Student(string name, int age, string major) {
+        super(name, age);           // chains to Human's constructor
+        this.major = major;
+    }
+}
+
+/**
+ *  And example of how to declare, access and free classes and their instances
+ *
+ */
+void classExample() {
+    /**
+     * Class Declaration and usage
+     */
+
+    Human john = new Human("John Doe", 20);
+
+    print("This is %s, who is %d years old now!\n", john.name, john.age);  // 20
+
+    for (int i = 0; i < 20; i++) {
+        john.ageUp();
+ 
+    }   // "int i" is now freed since the function it belonged to has closed
+
+    print("John is now %d years old\n", john.age); // 40
+
+    address int aAge = addressof(john.age)
+    print("The address lies here: " + (string)aAge + "\n") // Casting address into a string for concatenation
+
+    // Force the program to free john from memory early
+    mem_free(john);
+
+    // keep in mind that the pointer is still alive, and needs to be killed by the program ending, or the user
+    mem_free(aAge);
+}
+
+/**
+ * 
+ *
+ */
+void conditionalsExample() {
+    /**
+     * Conditionals
+     */
+
+    char seats = "xxoxox"; // converts the string into an array of chars
+    // same syntax: char seats = ['x', 'x', 'o', 'x', 'o', 'x'];
+
+    address char aSeat = seats[0];
+    while(aSeat != '\0') {
+
+        if (valueat(aSeat) == 'x') {
+            print("This seat is empty\n");
+        } else {
+            print("This seat is available\n");
+        }
+
+        aSeat++; // Same as += sizeof(typeof(aSeat))
+    }
+}
+
+/**
+ *  The main function, where the program seeks to start
+ *
+ */
+int main() {
+
+    classExample();
+
+    conditionalsExample();
+
+    return 0;
+}
