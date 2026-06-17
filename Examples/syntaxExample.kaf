@@ -46,7 +46,7 @@ void classExample() {
 
     print("John is now %d years old\n", john.age); // 40
 
-    address int aAge = addressof(john.age)
+    address<int> aAge = addressof(john.age)
     print("The address lies here: " + (string)aAge + "\n") // Casting address into a string for concatenation
 
     // Force the program to free john from memory early
@@ -68,7 +68,7 @@ void conditionalsExample() {
     char seats = "xxoxox"; // converts the string into an array of chars
     // same syntax: char seats = ['x', 'x', 'o', 'x', 'o', 'x'];
 
-    address char aSeat = seats[0];
+    address<char> aSeat = seats[0];
     while(aSeat != '\0') {
 
         if (valueat(aSeat) == 'x') {
@@ -79,6 +79,21 @@ void conditionalsExample() {
 
         aSeat++; // Same as += sizeof(typeof(aSeat))
     }
+}
+
+void arrayExample() {
+
+    string names = ["John", "Alexander", "Fujimoto"];
+
+    names.add("Kate");
+    names[2] = "Fuji";
+
+    for (string n : names) {
+        print("Yes, I know a " + n + ".\n");
+    }
+
+    print("But I know " + names[0] + " best of them all.");
+
 }
 
 /**

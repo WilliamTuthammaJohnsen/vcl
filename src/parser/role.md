@@ -1,0 +1,1 @@
+It is the parser's role to convert tokens into simplified instructions
